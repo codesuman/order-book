@@ -1,0 +1,8 @@
+.additional-details{
+    cursor: pointer;
+}
+
+.additional-details p{
+    color: rgb(63, 63, 230); 
+    font-weight: bold;
+}

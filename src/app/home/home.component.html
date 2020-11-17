@@ -1,0 +1,32 @@
+<div class="all-tables-icons" *ngIf="orders.length>0; else fresh_start">
+    <span>
+        <label class="checkbox-inline">
+            <input type="checkbox" [ngModel]="showChangePerUnitChecked" (ngModelChange)="toggleShowChangePerUnit()">
+            &nbsp; Change Per Unit
+        </label>
+    </span>
+    <span (click)="collapseAll(false)" data-toggle="tooltip" title="Expand All">
+        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-file-plus-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM8.5 6a.5.5 0 0 0-1 0v1.5H6a.5.5 0 0 0 0 1h1.5V10a.5.5 0 0 0 1 0V8.5H10a.5.5 0 0 0 0-1H8.5V6z"/>
+        </svg>
+    </span>
+    <span (click)="collapseAll(true)" data-toggle="tooltip" title="Collapse All">
+        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-file-minus-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM6 7.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1H6z"/>
+        </svg>
+    </span>
+</div>
+
+<div>
+    <pnl-component *ngFor="let order of orders" [order]="order" (deleteOrder)="onDeleteOrder($event)"></pnl-component>
+</div>
+
+<ng-template #fresh_start>
+    <div class="jumbotron" style="background-color: #fff; height: calc(95vh);">
+        <h1>Welcome to Order Book App</h1>
+        <p class="lead">
+          No orders :-(
+        </p>
+        <a class="btn btn-lg btn-primary" routerLink="/order-form" role="button">Create Order</a>
+    </div>
+</ng-template>

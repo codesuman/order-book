@@ -1,0 +1,74 @@
+<div class="card border-dark mb-3">
+    <div class="card-header" (click)="order.hideSpreadDetails = !order.hideSpreadDetails" *ngIf="order">
+        <span class="header-icons" *ngIf="order.hideSpreadDetails">
+          <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-chevron-right" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+          </svg>
+        </span>
+        <span class="header-icons" *ngIf="!order.hideSpreadDetails">
+          <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-chevron-down" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+          </svg>
+        </span>
+
+        <span style="font-weight:bold">{{order.name}}</span>&nbsp;&nbsp;
+        <span class="header-corner">
+          {{order.price}}
+        </span>
+        <span>&nbsp;
+          * {{order.quantity}} =&nbsp;
+        </span>
+        <span class="header-corner">
+          {{order.price * order.quantity}}
+        </span>
+        <span class="header-action-icons" (click)="editClick($event)">
+          <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pencil-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456l-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+          </svg>
+        </span>
+        <span class="header-action-icons" (click)="cloneClick($event)">
+          <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-stickies" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M0 1.5A1.5 1.5 0 0 1 1.5 0H13a1 1 0 0 1 1 1H1.5a.5.5 0 0 0-.5.5V14a1 1 0 0 1-1-1V1.5z"/>
+            <path fill-rule="evenodd" d="M2 3.5A1.5 1.5 0 0 1 3.5 2h11A1.5 1.5 0 0 1 16 3.5v6.086a1.5 1.5 0 0 1-.44 1.06l-4.914 4.915a1.5 1.5 0 0 1-1.06.439H3.5A1.5 1.5 0 0 1 2 14.5v-11zM3.5 3a.5.5 0 0 0-.5.5v11a.5.5 0 0 0 .5.5h6.086a.5.5 0 0 0 .353-.146l4.915-4.915A.5.5 0 0 0 15 9.586V3.5a.5.5 0 0 0-.5-.5h-11z"/>
+            <path fill-rule="evenodd" d="M10.5 10a.5.5 0 0 0-.5.5v5H9v-5A1.5 1.5 0 0 1 10.5 9h5v1h-5z"/>
+          </svg>
+        </span>
+        <span class="header-action-icons" (click)="deleteClick($event)">
+          <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-trash" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+          </svg>
+        </span>
+    </div>
+    <div class="card-body text-dark" *ngIf="!order?.hideSpreadDetails">
+        <table class="table table-sm">
+            <thead>
+              <tr>
+                <th scope="col">%</th>
+                <th scope="col">Return</th>
+                <th scope="col">Total Loss</th>
+                <th scope="col" *ngIf="order.showChangePerUnit">Down / Unit</th>
+                <th scope="col">POL / Unit</th>
+                <th scope="col" *ngIf="order.showChangePerUnit">Up / Unit</th>
+                <th scope="col">Total Profit</th>
+                <th scope="col">Return</th>
+                <th scope="col">%</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let spread of pnlSpreads">
+                <th scope="row">{{spread.percentage}}</th>
+                <td [style.background]="spread.lossHSL">{{spread.totalDown}}</td>
+                <td [style.background]="spread.lossHSL">{{spread.totalProfitOrLoss}}</td>
+                <td [style.background]="spread.lossHSL" *ngIf="order.showChangePerUnit">{{spread.perUnitDown}}</td>
+                <td>{{spread.perUnitProfitOrLoss}}</td>
+                <td [style.background]="spread.profitHSL" *ngIf="order.showChangePerUnit">{{spread.perUnitUp}}</td>
+                <td [style.background]="spread.profitHSL">{{spread.totalProfitOrLoss}}</td>
+                <td [style.background]="spread.profitHSL">{{spread.totalUp}}</td>
+                <th scope="row">{{spread.percentage}}</th>
+              </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

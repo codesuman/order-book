@@ -1,0 +1,29 @@
+.card .card-header{
+    cursor: pointer;
+}
+
+.header-corner {
+    background-color: #dadada;
+    border-radius: 5px;
+    border: 1px solid #898a8a;
+    padding: 7px;
+}
+
+.header-icons{
+    margin-right: 10px;
+}
+
+.header-action-icons{
+    float: right; 
+    margin-left: 15px;
+}
+
+.card-body .table{
+    margin-bottom: 0em;
+}
+
+
+/**
+* Toggle CSS
+* https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_switch
+*/
