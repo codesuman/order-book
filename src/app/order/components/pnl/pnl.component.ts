@@ -13,6 +13,7 @@ export class PNLComponent implements OnInit {
 
   @Input() order!:OrderDetails;
   @Output() deleteOrder = new EventEmitter<number>();
+  @Output() cloneOrder = new EventEmitter<number>();
 
   constructor(private router: Router) {}
 
@@ -28,8 +29,6 @@ export class PNLComponent implements OnInit {
 
       let currRange = this.order.rangeStart;
       
-      // currRange += this.order.interval;
-
       do {
         i++;
         currRange += this.order.interval;
@@ -42,11 +41,6 @@ export class PNLComponent implements OnInit {
           )
         );
       } while (currRange<this.order.rangeEnd);
-
-      // while(currRange<=this.order.rangeEnd){
-      //   this.pnlSpreads.push(new Spread(this.order.price, this.order.quantity, currRange));
-      //   currRange += this.order.interval;
-      // }
     }
   }
 
@@ -60,6 +54,8 @@ export class PNLComponent implements OnInit {
   cloneClick(event: MouseEvent){
     event.stopPropagation();
     console.log(`Clone Clicked`);
+
+    this.cloneOrder.emit(this.order.id);
   }
 
   deleteClick(event: MouseEvent){

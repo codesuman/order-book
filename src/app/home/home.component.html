@@ -18,7 +18,7 @@
 </div>
 
 <div>
-    <pnl-component *ngFor="let order of orders" [order]="order" (deleteOrder)="onDeleteOrder($event)"></pnl-component>
+    <pnl-component *ngFor="let order of orders" [order]="order" (deleteOrder)="onDeleteOrder($event)" (cloneOrder)="onCloneOrder($event)"></pnl-component>
 </div>
 
 <ng-template #fresh_start>
