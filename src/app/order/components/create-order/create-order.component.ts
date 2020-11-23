@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {Router} from '@angular/router';
 import {ActivatedRoute} from "@angular/router";
+import { Subscriber } from 'rxjs';
 
 import { OrderDetails } from '../../interfaces/order-details';
 import { OrderService } from '../../services/order.service';
@@ -16,14 +17,23 @@ export class CreateOrderComponent implements OnInit {
   updateOrder:boolean = false;
   cloneOrder: boolean = false;
 
-  constructor(private router: Router, private route: ActivatedRoute, private orderService: OrderService) { 
+  constructor(
+    private router: Router, 
+    private route: ActivatedRoute, 
+    private orderService: OrderService) {}
+
+  ngOnInit(): void {
+    this.subscribeToRoutes();
+  }
+  
+  subscribeToRoutes() {
     this.route.params.subscribe(params => {
       console.log(params);
 
       let orders:Array<OrderDetails> = JSON.parse(<string>localStorage.getItem("Orders")) || [];
 
       if(params.id){
-        // Edit
+        // Update / Clone
         this.updateOrder = true;
 
         orders.some(order => {
@@ -46,9 +56,6 @@ export class CreateOrderComponent implements OnInit {
     });
 
     if(this.router.getCurrentNavigation()?.extras.state?.isClone) this.cloneOrder = true;
-  }
-
-  ngOnInit(): void {
   }
 
   createOrUpdateOrder(){
