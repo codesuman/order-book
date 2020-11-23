@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { OrderDetails } from '../order/interfaces/order-details';
 import { OrderService } from '../order/services/order.service';
 
@@ -11,7 +12,7 @@ export class HomeComponent implements OnInit {
   orders:Array<OrderDetails> = [];
   showChangePerUnitChecked: boolean = true;
 
-  constructor(private orderService: OrderService) { }
+  constructor(private router: Router, private orderService: OrderService) { }
 
   ngOnInit(): void {
     this.orders = this.orderService.orders.map(order => Object.assign(order, {showChangePerUnit: this.showChangePerUnitChecked}));
@@ -49,6 +50,10 @@ export class HomeComponent implements OnInit {
 
     this.orders.unshift(Object.assign({}, order, {id: ++maxId}));
     this.orderService.orders = this.orders;
+
+    this.router.navigateByUrl(`/order-form/`+maxId, { 
+      state: { isClone: true } 
+    });
   }
 
 }

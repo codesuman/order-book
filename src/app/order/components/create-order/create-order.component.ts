@@ -14,6 +14,7 @@ export class CreateOrderComponent implements OnInit {
   order:OrderDetails|null = null;
   showAdditionalDetailsForm: boolean = false;
   updateOrder:boolean = false;
+  cloneOrder: boolean = false;
 
   constructor(private router: Router, private route: ActivatedRoute, private orderService: OrderService) { 
     this.route.params.subscribe(params => {
@@ -43,6 +44,8 @@ export class CreateOrderComponent implements OnInit {
         this.order = {id: maxId, name: "", price: 0, quantity: 25, rangeStart: 0, rangeEnd: 50, interval: 5};
       }
     });
+
+    if(this.router.getCurrentNavigation()?.extras.state?.isClone) this.cloneOrder = true;
   }
 
   ngOnInit(): void {
@@ -55,4 +58,12 @@ export class CreateOrderComponent implements OnInit {
     this.router.navigateByUrl('/home');
   }
 
+  cancelAction(){
+    if(this.cloneOrder) {
+      let orders = this.orderService.orders.filter(order => order.id !== this.order?.id);
+      this.orderService.orders = orders;
+    }
+
+    this.router.navigateByUrl('/home');
+  }
 }
