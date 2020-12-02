@@ -37,7 +37,7 @@ export class PNLComponent implements OnInit {
             this.order.price, 
             this.order.quantity, 
             currRange, 
-            {hues, saturation : (i<=4) ? saturation : saturation+5, light: light - (i*7)}
+            {hues, saturation : (i<=4) ? saturation : saturation+5, light: (i<=9) ? light - (i*7) : light - 63}
           )
         );
       } while (currRange<this.order.rangeEnd);

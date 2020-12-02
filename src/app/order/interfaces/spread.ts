@@ -8,19 +8,19 @@ export class Spread {
     constructor(price: number, quantity: number, percentage: number, hsl: any){
         this.price = price;
         this.quantity = quantity;
-        this.percentage = percentage;
+        this.percentage = +percentage.toFixed(2);
         this.hsl = hsl;
 
         this.calculate();
     }
     
     private calculate() {
-        this._perUnitProfitOrLoss = Math.floor(this.price * (this.percentage / 100));
+        this._perUnitProfitOrLoss = +(this.price * (this.percentage / 100)).toFixed(2);
 
         this._perUnitUp = this.price + this._perUnitProfitOrLoss;
         this._perUnitDown = this.price - this._perUnitProfitOrLoss;
         
-        this._totalProfitOrLoss = Math.ceil(this.quantity * this._perUnitProfitOrLoss);
+        this._totalProfitOrLoss = +(this.quantity * this._perUnitProfitOrLoss).toFixed(2);
 
         this._totalUp = (this.price * this.quantity) + this._totalProfitOrLoss;
         this._totalDown = (this.price * this.quantity) - this._totalProfitOrLoss;
