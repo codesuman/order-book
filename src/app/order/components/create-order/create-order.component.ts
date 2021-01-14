@@ -51,7 +51,7 @@ export class CreateOrderComponent implements OnInit {
         orders.forEach(order => maxId = Math.max(order.id || 0, maxId));
         maxId++;
 
-        this.order = {id: maxId, name: "", price: 0, quantity: 25, rangeStart: 0, rangeEnd: 3, interval: 0.5};
+        this.order = {id: maxId, name: "", price: 0, quantity: 25, rangeStart: 0, rangeEnd: 10, interval: 0.5};
       }
     });
 
