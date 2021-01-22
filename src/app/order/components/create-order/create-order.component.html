@@ -16,16 +16,34 @@
                     <small id="nameHelp" class="form-text text-muted">Please enter the Order name</small>
                     <br>
       
-                    <label for="price">Order Price</label>
-                    <input [(ngModel)]="order.price" type="number" name="price" class="form-control" id="price" aria-describedby="priceHelp" placeholder="Enter the Order price">
-                    <small id="priceHelp" class="form-text text-muted">Please enter the Order price</small>
+                    <label for="price">Avg Price</label>
+                    <input [ngModel]="order.price" type="number" name="price" class="form-control" id="price" aria-describedby="priceHelp" placeholder="Enter the Order price">
                     <br>
       
-                    <label for="quantity">Order Quantity</label>
-                    <input [(ngModel)]="order.quantity" type="number" name="quantity" class="form-control" id="quantity" aria-describedby="quantityHelp" placeholder="Enter the Order quantity">
-                    <small id="quantityHelp" class="form-text text-muted">Please enter the Order quantity</small>
+                    <label for="quantity">Total Quantity</label>
+                    <input [ngModel]="order.quantity" type="number" name="quantity" class="form-control" id="quantity" aria-describedby="quantityHelp" placeholder="Enter the Order quantity">
 
                     <hr>
+
+                    <div class="row" *ngFor="let pqPair of order.priceQuantityPairs">
+                      <div class="col-sm-4">
+                        <input [ngModel]="pqPair.price" (ngModelChange)="pqPairPriceChange()" type="number" name="price" class="form-control" placeholder="Enter the Order price">
+                        <small class="form-text text-muted">Please enter the Order price</small>
+                        <br>
+                      </div>
+
+                      <div class="col-sm-4">
+                        <input [ngModel]="pqPair.quantity" (ngModelChange)="pqPairQtyChange()" type="number" name="quantity" class="form-control" placeholder="Enter the Order quantity">
+                        <small class="form-text text-muted">Please enter the Order quantity</small>
+                      </div>
+
+                      <div class="col-sm-2">
+                        <button class="btn btn-primary float-right" (click)="removePriceQuantityPair(pqPair.id)">-</button>
+                      </div>
+                      <div class="col-sm-2">
+                        <button class="btn btn-primary" (click)="addPriceQuantityPair()">+</button>
+                      </div>
+                    </div>
 
                     <div (click)="showAdditionalDetailsForm = !showAdditionalDetailsForm" class="additional-details">
                       <p>
