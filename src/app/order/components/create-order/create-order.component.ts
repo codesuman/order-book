@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import {Router} from '@angular/router';
 import {ActivatedRoute} from "@angular/router";
 import { Subscriber } from 'rxjs';
@@ -13,7 +14,7 @@ import { OrderService } from '../../services/order.service';
 })
 export class CreateOrderComponent implements OnInit {
   order:OrderDetails|null = null;
-  showAdditionalDetailsForm: boolean = false;
+  showAdditionalDetailsForm: boolean = true;
   updateOrder:boolean = false;
   cloneOrder: boolean = false;
 
@@ -72,5 +73,17 @@ export class CreateOrderComponent implements OnInit {
     }
 
     this.router.navigateByUrl('/home');
+  }
+
+  onSubmit(form: NgForm){
+    console.log(`On Submit handler : `);
+    
+    console.log(form.value);
+
+    console.log(`Post conversion : `);
+
+    this.order = <OrderDetails><unknown>form.value;
+    console.log(this.order);
+    
   }
 }
