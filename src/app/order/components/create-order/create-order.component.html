@@ -5,7 +5,7 @@
     <div class="card-body" *ngIf="order">
         <div class="row">
             <div class="col-sm-8 offset-sm-2">
-                <form>
+                <form #createOrderForm="ngForm" (ngSubmit)="onSubmit(createOrderForm)">
                   <div class="form-group">
                     <label for="id">ID</label>
                     <input [(ngModel)]="order.id" type="text" name="id" class="form-control" id="id" aria-describedby="idHelp" placeholder="Enter ID">
@@ -65,24 +65,25 @@
                     <div *ngIf="showAdditionalDetailsForm">
                       <label for="rangeStart">Range Start</label>
                       <input [(ngModel)]="order.rangeStart" type="number" name="rangeStart" class="form-control" id="rangeStart" aria-describedby="rangeStartHelp" placeholder="Enter Range Start value">
-                      <small id="rangeStartHelp" class="form-text text-muted">Please enter the Range Start value</small>
                       <br>
         
                       <label for="rangeEnd">Range End</label>
                       <input [(ngModel)]="order.rangeEnd" type="number" name="rangeEnd" class="form-control" id="rangeEnd" aria-describedby="rangeEndHelp" placeholder="Enter Range Start value">
-                      <small id="rangeEndHelp" class="form-text text-muted">Please enter the Range Start value</small>
                       <br>
         
                       <label for="interval">Interval</label>
                       <input [(ngModel)]="order.interval" type="number" name="interval" class="form-control" id="interval" aria-describedby="intervalHelp" placeholder="Enter Range Start value">
-                      <small id="intervalHelp" class="form-text text-muted">Please enter the Range Start value</small>
                       <br>
                     </div>
                   </div>
+
+                  <!-- <button class="btn btn-primary" (click)="createOrUpdateOrder()">{{updateOrder ? 'Update' : 'Create'}} Order</button> -->
+                  <button class="btn btn-primary" type="submit">{{updateOrder ? 'Update' : 'Create'}} Order</button>
+                  &nbsp;&nbsp;
+                  <button class="btn btn-default" (click)="cancelAction()">Cancel</button>
                 </form>
-                <button class="btn btn-primary" (click)="createOrUpdateOrder()">{{updateOrder ? 'Update' : 'Create'}} Order</button>
-                &nbsp;&nbsp;
-                <button class="btn btn-default" (click)="cancelAction()">Cancel</button>
+
+                <pre>{{createOrderForm.value | json}}</pre>
             </div>
           </div>
     </div>
