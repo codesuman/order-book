@@ -134,6 +134,8 @@ export class CreateOrderComponent implements OnInit {
 
     this.order.price = totalPrice / totalQty;
     this.order.quantity = totalQty;
+  }
+
   onSubmit(form: NgForm){
     console.log(`On Submit handler : `);
     

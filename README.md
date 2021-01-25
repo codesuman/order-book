@@ -25,3 +25,10 @@ Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protrac
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+
+
+# TEMPLATE DRIVEN FORMS :
+https://codecraft.tv/courses/angular/forms/template-driven/
+https://ramya-bala221190.medium.com/implementing-dynamic-template-driven-forms-in-angular-40527de8c064
+
+https://stackoverflow.com/questions/44308795/iterating-through-a-formarray-containing-formgroups-with-ngfor

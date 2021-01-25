@@ -25,24 +25,24 @@
 
                     <hr>
 
-                    <div class="row" *ngFor="let pqPair of order.priceQuantityPairs">
-                      <div class="col-sm-4">
-                        <input [ngModel]="pqPair.price" (ngModelChange)="pqPairPriceChange()" type="number" name="price" class="form-control" placeholder="Enter the Order price">
-                        <small class="form-text text-muted">Please enter the Order price</small>
-                        <br>
-                      </div>
+                    <div class="row" *ngFor="let pqPair of order.priceQuantityPairs; let i=index;" ngModelGroup="priceQuantityPairs">
+                        <div class="col-sm-4">
+                          <input [ngModel]="pqPair.price" (ngModelChange)="pqPairPriceChange()" type="number" name="price_{{pqPair.id}}" class="form-control" placeholder="Enter the Order price">
+                          <small class="form-text text-muted">Please enter the Order price</small>
+                          <br>
+                        </div>
 
-                      <div class="col-sm-4">
-                        <input [ngModel]="pqPair.quantity" (ngModelChange)="pqPairQtyChange()" type="number" name="quantity" class="form-control" placeholder="Enter the Order quantity">
-                        <small class="form-text text-muted">Please enter the Order quantity</small>
-                      </div>
+                        <div class="col-sm-4">
+                          <input [ngModel]="pqPair.quantity" (ngModelChange)="pqPairQtyChange()" type="number" name="quantity_{{pqPair.id}}" class="form-control" placeholder="Enter the Order quantity">
+                          <small class="form-text text-muted">Please enter the Order quantity</small>
+                        </div>
 
-                      <div class="col-sm-2">
-                        <button class="btn btn-primary float-right" (click)="removePriceQuantityPair(pqPair.id)">-</button>
-                      </div>
-                      <div class="col-sm-2">
-                        <button class="btn btn-primary" (click)="addPriceQuantityPair()">+</button>
-                      </div>
+                        <div class="col-sm-2">
+                          <button class="btn btn-primary float-right" (click)="removePriceQuantityPair(pqPair.id)">-</button>
+                        </div>
+                        <div class="col-sm-2">
+                          <button class="btn btn-primary" (click)="addPriceQuantityPair()">+</button>
+                        </div>
                     </div>
 
                     <div (click)="showAdditionalDetailsForm = !showAdditionalDetailsForm" class="additional-details">
