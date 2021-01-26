@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, Validators, FormControl } from '@angular/forms';
 import {Router} from '@angular/router';
 import {ActivatedRoute} from "@angular/router";
 import { Subscriber } from 'rxjs';
@@ -19,7 +19,10 @@ export class CreateOrderComponent implements OnInit {
   updateOrder:boolean = false;
   cloneOrder: boolean = false;
 
+  public orderForm: FormGroup = new FormGroup({});
+
   constructor(
+    private fb: FormBuilder,
     private router: Router, 
     private route: ActivatedRoute, 
     private orderService: OrderService) {}
@@ -46,21 +49,40 @@ export class CreateOrderComponent implements OnInit {
           return false;
         });
 
+        if(this.order) {
+          this.orderForm = this.fb.group({
+            id: [this.order.id, Validators.required],
+            name: [this.order.name, Validators.required],
+            price: [this.order.price, Validators.required],
+            quantity: [this.order.quantity, Validators.required],
+            rangeStart: [this.order.rangeStart, Validators.required],
+            rangeEnd: [this.order.rangeEnd, Validators.required],
+            interval: [this.order.interval, Validators.required],
+            priceQuantityPairs: this.fb.array([])
+          });
+
+          this.order.priceQuantityPairs.forEach(pqPair => this.addPQPair(null, pqPair));
+        }
+
         if(!this.order) console.log(`Order not found for Update`);
       } else{
         // Create
         let maxId = Number.MIN_VALUE;
         orders.forEach(order => maxId = Math.max(order.id || 0, maxId));
         maxId++;
-
-        this.order = {id: maxId, name: "", price: 0, quantity: 25, rangeStart: 0, rangeEnd: 10, interval: 0.5, priceQuantityPairs: [
-            {id: 0, price: 0, quantity: 2}, 
-            // {id: 1, price: 10, quantity: 25}, 
-            // {id: 2, price: 20, quantity: 50}
-          ]
-        };
         
-        // this.reconcileAveragePrice();
+        this.orderForm = this.fb.group({
+          id: [maxId, Validators.required],
+          name: ['', Validators.required],
+          price: [0, Validators.required],
+          quantity: [0, Validators.required],
+          rangeStart: [0, Validators.required],
+          rangeEnd: [10, Validators.required],
+          interval: [0.5, Validators.required],
+          priceQuantityPairs: this.fb.array([])
+        });
+
+        this.addPQPair(null, null);
       }
     });
 
@@ -83,68 +105,56 @@ export class CreateOrderComponent implements OnInit {
     this.router.navigateByUrl('/home');
   }
 
-  addPriceQuantityPair(){
-    console.log(`ADD PRICE QUANTITY PAIR : `);
-    
-    let maxId = -1;
-    this.order?.priceQuantityPairs.forEach(pqPair => maxId = Math.max(pqPair.id || 0, maxId));
-
-    this.order?.priceQuantityPairs.push({id: ++maxId, price: 1, quantity: 100});
-  }
-
-  removePriceQuantityPair(id: number){
-    console.log(`RemovePriceQuantityPair : ${id}`);
-    
-    let index = -1;
-
-    this.order?.priceQuantityPairs.some((pq, i) => {
-      if(pq.id === id) {
-        index = i;
-        return true;
-      }
-
-      return false;
-    });
-
-    if(index !== -1) this.order?.priceQuantityPairs.splice(index, 1);
-  }
-
-  pqPairPriceChange(){
-    console.log(`PQ PairPriceChange`);
-    this.reconcileAveragePrice();
-  }
-
-  pqPairQtyChange(){
-    console.log(`PQ PairQtyChange`);
-    this.reconcileAveragePrice();
-  }
-
   reconcileAveragePrice(){
     console.log(`ReconcileAveragePrice`);
     
-    if(!this.order) return;
-
     let totalPrice = 0;
     let totalQty = 0;
 
-    this.order?.priceQuantityPairs.forEach(pqPair => {
+    this.orderForm?.value.priceQuantityPairs.forEach((pqPair:any) => {
       totalPrice += (pqPair.price * pqPair.quantity);
-      totalQty += pqPair.quantity;
+      totalQty += Number.parseInt(pqPair.quantity);
     });
 
-    this.order.price = totalPrice / totalQty;
-    this.order.quantity = totalQty;
+    this.orderForm.patchValue({
+      price: totalPrice / totalQty,
+      quantity: totalQty
+    });
   }
 
-  onSubmit(form: NgForm){
+  onSubmit(){
     console.log(`On Submit handler : `);
-    
-    console.log(form.value);
 
-    console.log(`Post conversion : `);
+    console.log(this.orderForm.value);
 
-    this.order = <OrderDetails><unknown>form.value;
-    console.log(this.order);
+    this.order = this.orderForm.value;
+    this.orderService.createOrder(this.order);
     
+    this.router.navigateByUrl('/home');
   }
+
+  removePQPair(i: number) {
+    let usersArray = this.orderForm.get('priceQuantityPairs') as FormArray;
+    usersArray.removeAt(i);
+
+    this.reconcileAveragePrice();
+  }
+
+  addPQPair(event: Event|null, pqPair: PriceQuantity | null) {
+    if(event) event.preventDefault();
+
+    let priceQuantityPairs = this.orderForm.get('priceQuantityPairs') as FormArray;
+    let arraylen = priceQuantityPairs.length;
+
+    let newPQGroup: FormGroup = this.fb.group({
+      price: [(pqPair)?pqPair.price : 0, Validators.required],
+      quantity: [(pqPair)?pqPair.quantity : 100, Validators.required]
+    })
+
+    priceQuantityPairs.insert(arraylen, newPQGroup);
+  }
+
+  getControls() {
+    return (this.orderForm.get('priceQuantityPairs') as FormArray).controls as Array<FormGroup>;
+  }    
 }

@@ -28,7 +28,11 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 
 # TEMPLATE DRIVEN FORMS :
+Perfect read for understanding everything about Angular Forms :
+https://www.bitovi.com/blog/managing-nested-and-dynamic-forms-in-angular
+
 https://codecraft.tv/courses/angular/forms/template-driven/
 https://ramya-bala221190.medium.com/implementing-dynamic-template-driven-forms-in-angular-40527de8c064
 
 https://stackoverflow.com/questions/44308795/iterating-through-a-formarray-containing-formgroups-with-ngfor
+
