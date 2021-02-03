@@ -65,7 +65,7 @@ export class CreateOrderComponent implements OnInit {
         }
 
         if(!this.order) console.log(`Order not found for Update`);
-      } else{
+      } else {
         // Create
         let maxId = Number.MIN_VALUE;
         orders.forEach(order => maxId = Math.max(order.id || 0, maxId));
@@ -90,6 +90,8 @@ export class CreateOrderComponent implements OnInit {
   }
 
   createOrUpdateOrder(){
+    this.order = this.orderForm.value;
+    
     if(this.updateOrder) this.orderService.updateOrder(this.order);
     else this.orderService.createOrder(this.order);
     
@@ -120,17 +122,6 @@ export class CreateOrderComponent implements OnInit {
       price: totalPrice / totalQty,
       quantity: totalQty
     });
-  }
-
-  onSubmit(){
-    console.log(`On Submit handler : `);
-
-    console.log(this.orderForm.value);
-
-    this.order = this.orderForm.value;
-    this.orderService.createOrder(this.order);
-    
-    this.router.navigateByUrl('/home');
   }
 
   removePQPair(i: number) {
