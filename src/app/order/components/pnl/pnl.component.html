@@ -13,13 +13,13 @@
 
         <span style="font-weight:bold">{{order.name}}</span>&nbsp;&nbsp;
         <span class="header-corner">
-          {{order.price}}
+          {{order.price | number:'1.0-2'}}
         </span>
         <span>&nbsp;
           * {{order.quantity}} =&nbsp;
         </span>
         <span class="header-corner">
-          {{order.price * order.quantity}}
+          {{(order.price * order.quantity)  | number:'1.0-2'}}
         </span>
         <span class="header-action-icons" (click)="editClick($event)">
           <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pencil-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
