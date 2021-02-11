@@ -1,0 +1,52 @@
+<div class="row">
+    <div class="col-sm-3">
+        <label for="optionIndices">Index:</label>
+        <select name="optionIndices" id="optionIndices" (ngModelChange)="onOptionIndexChange($event)" [ngModel]="selectedOptionIndex">
+            <option [ngValue]="optionIndex" *ngFor="let optionIndex of optionIndices">{{optionIndex.symbol}}</option>
+        </select>
+    </div>
+
+    <div class="col-sm-3">
+        <label for="options">Option:</label>
+        <select name="options" id="options" (ngModelChange)="onOptionChange($event)" [ngModel]="selectedOption">
+            <option [ngValue]="option" *ngFor="let option of options">{{option.strikePrice}} {{option.type}}</option>
+        </select>
+    </div>
+
+    <!-- <div class="col-sm-2">
+        <label for="dates">Dates:</label>
+        <select name="dates" id="dates" (ngModelChange)="onOCDateChange($event)" [ngModel]="selectedOCDate">
+            <option [ngValue]="oiDate" *ngFor="let oiDate of oiDatesArray">{{oiDate}}</option>
+        </select>
+    </div> -->
+
+    <div class="col-sm-6">
+        <label *ngFor="let option of selectedOptions">{{option.strikePrice}} {{option.type}} <span style="background-color: gray;" (click)="removeSelectedOption(option)">X</span></label>
+    </div>
+</div>
+
+<!-- <div class="row">
+    <div style="display: block;">
+        <canvas baseChart width="400" height="400"
+          [datasets]="lineChartData"
+          [labels]="lineChartLabels"
+          [options]="lineChartOptions"
+          [colors]="lineChartColors"
+          [legend]="lineChartLegend"
+          [chartType]="lineChartType"
+          [plugins]="lineChartPlugins">
+        </canvas>
+    </div>
+</div> -->
+
+<div class="row">
+    <canvas baseChart width="400" height="400"
+        [datasets]="optionChainData"
+        [labels]="oiChartLabels"
+        [options]="lineChartOptions"
+        [colors]="lineChartColors"
+        [legend]="lineChartLegend"
+        [chartType]="lineChartType"
+        [plugins]="lineChartPlugins">
+    </canvas>
+</div>

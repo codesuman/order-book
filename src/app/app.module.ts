@@ -1,6 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { ChartsModule } from 'ng2-charts';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -8,6 +10,7 @@ import { HomeComponent } from './home/home.component';
 import { HeaderComponent } from './header/header.component';
 import { CreateOrderComponent } from './order/components/create-order/create-order.component';
 import { PNLComponent } from './order/components/pnl/pnl.component';
+import { OIChartComponent } from './oi-chart/oi-chart.component';
 
 @NgModule({
   declarations: [
@@ -15,13 +18,16 @@ import { PNLComponent } from './order/components/pnl/pnl.component';
     HomeComponent,
     HeaderComponent,
     CreateOrderComponent,
-    PNLComponent
+    PNLComponent,
+    OIChartComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    HttpClientModule,
+    ChartsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

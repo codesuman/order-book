@@ -32,7 +32,16 @@ Perfect read for understanding everything about Angular Forms :
 https://www.bitovi.com/blog/managing-nested-and-dynamic-forms-in-angular
 
 https://codecraft.tv/courses/angular/forms/template-driven/
-https://ramya-bala221190.medium.com/implementing-dynamic-template-driven-forms-in-angular-40527de8c064
+https://ramya-bala221190.medium.com/
+implementing-dynamic-template-driven-forms-in-angular-40527de8c064
 
 https://stackoverflow.com/questions/44308795/iterating-through-a-formarray-containing-formgroups-with-ngfor
+
+
+
+# ANGULAR WITH NODE
+https://levelup.gitconnected.com/simple-application-with-angular-6-node-js-express-2873304fff0f
+ng serve --proxy-config proxy.conf.json
+
+https://medium.com/bb-tutorials-and-thoughts/how-to-develop-and-build-angular-app-with-nodejs-e24c40444421
 
