@@ -36,12 +36,7 @@ export class OIChartComponent implements OnInit {
   public lineChartOptions: ChartOptions = {
     responsive: true,
   };
-  public lineChartColors: Color[] = [
-    {
-      borderColor: '#3399ff',
-      backgroundColor: 'rgba(0,0,0,0)',
-    },
-  ];
+  public lineChartColors: Color[] = [];
   public lineChartLegend = true;
   public lineChartType: ChartType = 'line';
   public lineChartPlugins = [];
@@ -53,6 +48,8 @@ export class OIChartComponent implements OnInit {
   options: Array<any> = [];
   selectedOption: any = null;
   selectedOptions: Array<any> = [];
+  // optionsMap = new Map<Number, Object>();
+  optionsMap = {};
 
   // oiDates = new Set<String>();
   // oiDatesArray: Array<String> = [];
@@ -75,7 +72,7 @@ export class OIChartComponent implements OnInit {
       this.optionIndices = res.data;
       this.selectedOptionIndex = this.optionIndices[0];
 
-      this.getOptions()
+      this.getOptions();
     }, error => {
       console.log("Error fetching Option Indices.");
     });
@@ -88,12 +85,19 @@ export class OIChartComponent implements OnInit {
 
       this.options = res.data;
 
-      if(JSON.parse(<string>localStorage.getItem("SelectedOptions"))){
-        this.selectedOptions = JSON.parse(<string>localStorage.getItem("SelectedOptions"));
-      } else{
-        this.selectedOption = this.options[0];
-        this.selectedOptions.push(this.selectedOption);
-      }
+      // res.data.forEach((element: any) => {
+        // this.optionsMap.set(element['strikePrice'], {element.type: element});
+        // let optionObj: Object = this.optionsMap[element['strikePrice']]
+      // });
+
+      // if(JSON.parse(<string>localStorage.getItem("SelectedOptions"))){
+      //   this.selectedOptions = JSON.parse(<string>localStorage.getItem("SelectedOptions")) || [this.selectedOption];
+      // } else{
+      //   this.selectedOptions = [this.selectedOption];
+      // }
+
+      this.selectedOptions = JSON.parse(<string>localStorage.getItem("SelectedOptions")) || [this.selectedOption];
+      this.selectedOption = this.selectedOptions[0];
 
       this.getOptionChainData();
     }, error => {
@@ -103,27 +107,34 @@ export class OIChartComponent implements OnInit {
 
   getOptionChainData(){
     this.optionChainData = [];
-    let index = 0;
+    this.lineChartColors = [];
+    // let index = 0;
 
     let selectedOptions:Array<any> = JSON.parse(<string>localStorage.getItem("SelectedOptions")) || this.selectedOptions;
 
-    selectedOptions.forEach((opt) =>  {
-      this.optionChainData.push({ data: [], label: `${opt.strikePrice} ${opt.type}` });
-      this.lineChartColors.push({
-        backgroundColor: 'rgba(0,0,0,0)'
-      })
-    });
+    // selectedOptions.forEach((opt) =>  {
+    //   this.optionChainData.push({ data: [], label: `${opt.strikePrice} ${opt.type}` });
+    //   this.lineChartColors.push({
+    //     backgroundColor: 'rgba(0,0,0,0)'
+    //   })
+    // });
 
     for (const selectedOption of selectedOptions) {
       this.http.get(`/api/v1/nse-options/option-chain-data/${selectedOption['_id']}`).subscribe((res: any) => {
         console.log(`NSE Options Chain Data : `);
         console.log(res.data);
+        this.optionChainData.push({ data: res.data.map((val:any) => val.changeinOpenInterest), label: `${selectedOption.strikePrice} ${selectedOption.type}` });
+        
+        this.lineChartColors.push({
+          borderColor: (selectedOption.type === 'CE') ? '#fcba03' : '#ffffff',
+          backgroundColor: 'rgba(0,0,0,0)'
+        })
 
-        this.optionChainData[index++]['data'] = res.data.map((val:any) => {
+        // this.optionChainData[index++]['data'] = res.data.map((val:any) => {
           // this.oiDates.add(val.lastUpdatedTime.split(' ')[0]);
           // this.oiChartLabels.push(val.lastUpdatedTime.split(' ')[1]);
-          return val.changeinOpenInterest;
-        });
+          // return val.changeinOpenInterest;
+        // });
         
         this.oiChartLabels = res.data.map((val:any) => val.lastUpdatedTime.split(" ")[1]);
 
@@ -146,7 +157,7 @@ export class OIChartComponent implements OnInit {
   }
 
   onOptionChange(option: any){
-    console.log('onOptionChange');
+    console.log('OptionChange');
     console.log(option);
 
     this.selectedOption = option;
@@ -176,5 +187,12 @@ export class OIChartComponent implements OnInit {
 
     localStorage.setItem("SelectedOptions", JSON.stringify(this.selectedOptions));
     this.getOptionChainData();
+  }
+
+  downloadCanvas(event: any) {
+    let anchor = event.target;
+    // get the canvas
+    anchor.href = document.getElementsByTagName('canvas')[0].toDataURL();
+    anchor.download = "test.png";
   }
 }
