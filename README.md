@@ -38,6 +38,9 @@ implementing-dynamic-template-driven-forms-in-angular-40527de8c064
 https://stackoverflow.com/questions/44308795/iterating-through-a-formarray-containing-formgroups-with-ngfor
 
 
+# NG2 CHARTS
+Color Issue - https://github.com/valor-software/ng2-charts/issues/870
+Cannot read property 'transition' of null - https://github.com/chartjs/Chart.js/issues/5149
 
 # ANGULAR WITH NODE
 https://levelup.gitconnected.com/simple-application-with-angular-6-node-js-express-2873304fff0f

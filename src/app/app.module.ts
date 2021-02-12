@@ -10,7 +10,9 @@ import { HomeComponent } from './home/home.component';
 import { HeaderComponent } from './header/header.component';
 import { CreateOrderComponent } from './order/components/create-order/create-order.component';
 import { PNLComponent } from './order/components/pnl/pnl.component';
-import { OIChartComponent } from './oi-chart/oi-chart.component';
+// import { OIChartComponentOld } from './oi-chart/oi-chart.component';
+import { OIChartContainerComponent } from './oi-chart/components/oi-chart-container/oi-chart-container.component';
+import { OIChartComponent } from './oi-chart/components/oi-chart/oi-chart.component';
 
 @NgModule({
   declarations: [
@@ -19,6 +21,8 @@ import { OIChartComponent } from './oi-chart/oi-chart.component';
     HeaderComponent,
     CreateOrderComponent,
     PNLComponent,
+    // OIChartComponentOld,
+    OIChartContainerComponent,
     OIChartComponent
   ],
   imports: [

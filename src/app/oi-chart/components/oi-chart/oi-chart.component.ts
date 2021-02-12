@@ -31,7 +31,7 @@ export interface OIData {
 }
 
 @Component({
-  selector: 'app-oi-chart',
+  selector: 'oi-chart',
   templateUrl: './oi-chart.component.html',
   styleUrls: ['./oi-chart.component.css']
 })
