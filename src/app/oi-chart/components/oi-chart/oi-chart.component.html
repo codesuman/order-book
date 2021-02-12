@@ -1,7 +1,4 @@
-<p>oi-chart works!</p>
-
-
-<div class="row" style="margin-bottom: 10px;">
+<div class="row" style="margin: 15px 0;">
     <div class="col-sm-4">
         <label for="optionIndices">Index:</label>&nbsp;
         <select name="optionIndices" id="optionIndices" (ngModelChange)="onOptionIndexChange($event)" [ngModel]="selectedOptionIndex">
@@ -31,3 +28,5 @@
         [plugins]="lineChartPlugins">
     </canvas>
 </div>
+
+<div class="row"><hr></div>

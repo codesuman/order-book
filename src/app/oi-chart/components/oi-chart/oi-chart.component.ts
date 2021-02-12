@@ -1,23 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 import { BaseChartDirective, Color, Label } from 'ng2-charts';
-
-export interface OptionIndex {
-  _id: string,
-  symbol: string;
-  upcomingExpiryDate: string;
-  lastUpdatedTime: string;
-}
-
-export interface Option {
-  _id: string,
-  underlying: string;
-  strikePrice: number;
-  type: string;
-  expiryDate: string;
-  // data: Array<OIData>
-}
+import { OptionIndex } from '../../interfaces/option-index';
+import { Option } from '../../interfaces/option';
 
 export interface OIData {
   change: number;
@@ -71,7 +57,9 @@ export class OIChartComponent implements OnInit {
   @ViewChild('linechart') linechart: BaseChartDirective | undefined;
   // Charts - END
 
-  optionIndices: Array<OptionIndex> = [];
+  @Input() optionIndices: Array<OptionIndex> = [];
+  @Input() indexToStrikePricesMap = new Map<String, Map<Number, {'CE': Option, 'PE': Option}>>();
+  
   selectedOptionIndex: OptionIndex | null = null;
 
   options: Array<Option> = [];
@@ -93,22 +81,26 @@ export class OIChartComponent implements OnInit {
   constructor(private http:HttpClient) {}
 
   ngOnInit(): void {
-    this.getOptionIndices();
+    console.log(`OI Chart : Ng On Init :`);
+    
+    this.selectedOptionIndex = this.optionIndices[0];
+
+    this.setStrikePrices();
   }
 
-  getOptionIndices(){
-    this.http.get('/api/v1/nse-options/option-indices').subscribe((res: any) => {
-      // console.log(`NSE Options Indices : `);
-      // console.log(res.data);
+  // getOptionIndices(){
+  //   this.http.get('/api/v1/nse-options/option-indices').subscribe((res: any) => {
+  //     // console.log(`NSE Options Indices : `);
+  //     // console.log(res.data);
 
-      this.optionIndices = res.data;
-      this.selectedOptionIndex = this.optionIndices[0];
+  //     this.optionIndices = res.data;
+  //     this.selectedOptionIndex = this.optionIndices[0];
 
-      this.getOptions();
-    }, error => {
-      console.log("Error fetching Option Indices.");
-    });
-  }
+  //     this.getOptions();
+  //   }, error => {
+  //     console.log("Error fetching Option Indices.");
+  //   });
+  // }
 
   getOptions(){
     if(!this.selectedOptionIndex) return;
@@ -139,6 +131,22 @@ export class OIChartComponent implements OnInit {
     }, error => {
       console.log("Error fetching Options Data.");
     });
+  }
+
+  setStrikePrices(){
+    if(!this.selectedOptionIndex) return;
+
+    this.optionsMap = this.indexToStrikePricesMap.get(this.selectedOptionIndex.symbol) || new Map<Number, {'CE': Option, 'PE': Option}>();
+
+    console.log(`Options Map : `);
+    console.log(this.optionsMap);
+
+    this.strikePrices =[...this.optionsMap.keys()];
+    console.log(this.strikePrices);
+    
+    this.selectedStrikePrice = this.strikePrices[0];
+
+    this.getOptionChainData();
   }
 
   getOptionChainData(){
