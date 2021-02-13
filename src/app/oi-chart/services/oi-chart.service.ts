@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Observable, Subject, forkJoin } from 'rxjs';
 
 import { Option } from '../interfaces/option';
 import { OptionIndex } from '../interfaces/option-index';
@@ -9,10 +9,13 @@ import { OptionIndex } from '../interfaces/option-index';
   providedIn: 'root'
 })
 export class OiChartService {
-  // Observable string sources
+  // OptionIndicesFetched subject will be used by OIChartsContainerComponent when it should load the Chart components for first time
   private optionIndicesFetched = new Subject<boolean>();
   optionIndicesFetched$ = this.optionIndicesFetched.asObservable();
 
+  private optionsFetched = new Subject<boolean>();
+  optionsFetched$ = this.optionsFetched.asObservable();
+  
   optionIndices: Array<OptionIndex> = [];
   indexToStrikePricesMap = new Map<String, Map<Number, {'CE': Option, 'PE': Option}>>();
   
@@ -27,14 +30,16 @@ export class OiChartService {
 
       this.optionIndices = res.data;
 
-      this.getOptions(this.optionIndices[0]);
+      this.getOptions();
     }, error => {
       console.log("Error fetching Option Indices.");
     });
   }
 
-  getOptions(optionIndex: OptionIndex){
-    this.http.get(`/api/v1/nse-options/options/${optionIndex.symbol}`).subscribe((res: any) => {
+  // optionIndex : will be null of first time, when its called in the service constructor
+  // Rest it will be called from OI Chart Component's 
+  getOptions(optionIndex?: OptionIndex){
+    this.http.get(`/api/v1/nse-options/options/${(optionIndex) ? optionIndex.symbol : this.optionIndices[0].symbol}`).subscribe((res: any) => {
       // console.log(`NSE Options Data : `);
       // console.log(res.data);
 
@@ -51,13 +56,19 @@ export class OiChartService {
       console.log(`Options Map : `);
       console.log(optionsMap);
 
-      this.indexToStrikePricesMap.set(optionIndex.symbol, optionsMap);
+      this.indexToStrikePricesMap.set((optionIndex) ? optionIndex.symbol : this.optionIndices[0].symbol, optionsMap);
 
-      // this.loadCharts = true;
-      // TODO - This where subject next should be called
-      this.optionIndicesFetched.next(true);
+      if(optionIndex) this.optionsFetched.next(true);
+      else this.optionIndicesFetched.next(true);
     }, error => {
       console.log("Error fetching Options Data.");
     });
+  }
+
+  getOptionChainData(selectedOptions:Array<Option>): Observable<any>{
+    return forkJoin([
+      this.http.get(`/api/v1/nse-options/option-chain-data/${selectedOptions[0]['_id']}`),
+      this.http.get(`/api/v1/nse-options/option-chain-data/${selectedOptions[1]['_id']}`)
+    ]);
   }
 }

@@ -1,27 +1,18 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs';
+
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 import { BaseChartDirective, Color, Label } from 'ng2-charts';
 import { OptionIndex } from '../../interfaces/option-index';
 import { Option } from '../../interfaces/option';
-
-export interface OIData {
-  change: number;
-  changeinOpenInterest: number;
-  impliedVolatility: number;
-  lastPrice: number;
-  lastUpdatedTime: string;
-  openInterest: number;
-  pChange: number;
-  pchangeinOpenInterest: number;
-}
+import { OiChartService } from '../../services/oi-chart.service';
 
 @Component({
   selector: 'oi-chart',
   templateUrl: './oi-chart.component.html',
   styleUrls: ['./oi-chart.component.css']
 })
-export class OIChartComponent implements OnInit {
+export class OIChartComponent implements OnInit, OnDestroy {
   // Charts - START
   public optionChainData: ChartDataSets[] = [
     { data: [], label: 'CE' },
@@ -57,160 +48,130 @@ export class OIChartComponent implements OnInit {
   @ViewChild('linechart') linechart: BaseChartDirective | undefined;
   // Charts - END
 
-  @Input() optionIndices: Array<OptionIndex> = [];
-  @Input() indexToStrikePricesMap = new Map<String, Map<Number, {'CE': Option, 'PE': Option}>>();
-  
-  selectedOptionIndex: OptionIndex | null = null;
+  // OPTION INDEX CHANGE - Variables - START
+  optionsRequested: boolean = false;
+  optionsRequestedSubscription: Subscription;
+  // OPTION INDEX CHANGE - Variables - END
 
-  options: Array<Option> = [];
+  // INDEX - Select Box - START
+  optionIndices: Array<OptionIndex> = [];
+  selectedOptionIndex: OptionIndex | null = null;
+  // INDEX - Select Box - END
+
+  // STRIKE PRICE - Select Box - START
   strikePrices: Array<Number> = [];
   selectedStrikePrice: Number = 0;
+  // STRIKE PRICE - Select Box - END
 
-  // selectedOptions: Array<any> = [];
-  optionsMap = new Map<Number, {'CE': Option, 'PE': Option}>();
+  indexToStrikePricesMap = new Map<String, Map<Number, {'CE': Option, 'PE': Option}>>();
 
-  // oiDates = new Set<String>();
-  // oiDatesArray: Array<String> = [];
-  // selectedOCDate: String = '';
-
-  // public optionChainData: ChartDataSets[] = [
-  //   { data: [], label: 'Change in OI' },
-  // ];
   public oiChartLabels: Label[] = [];
 
-  constructor(private http:HttpClient) {}
+  constructor(private oiChartService: OiChartService) {
+    this.optionsRequestedSubscription = this.oiChartService.optionsFetched$.subscribe(val => {
+      if(this.optionsRequested) this.setStrikePrices();
+    });
+  }
 
   ngOnInit(): void {
     console.log(`OI Chart : Ng On Init :`);
     
-    this.selectedOptionIndex = this.optionIndices[0];
+    this.optionIndices = this.oiChartService.optionIndices;
+    this.indexToStrikePricesMap = this.oiChartService.indexToStrikePricesMap;
+
+    if(!this.selectedOptionIndex) this.selectedOptionIndex = this.optionIndices[0];
 
     this.setStrikePrices();
   }
 
-  // getOptionIndices(){
-  //   this.http.get('/api/v1/nse-options/option-indices').subscribe((res: any) => {
-  //     // console.log(`NSE Options Indices : `);
-  //     // console.log(res.data);
-
-  //     this.optionIndices = res.data;
-  //     this.selectedOptionIndex = this.optionIndices[0];
-
-  //     this.getOptions();
-  //   }, error => {
-  //     console.log("Error fetching Option Indices.");
-  //   });
-  // }
-
-  getOptions(){
-    if(!this.selectedOptionIndex) return;
-
-    this.http.get(`/api/v1/nse-options/options/${this.selectedOptionIndex.symbol}`).subscribe((res: any) => {
-      // console.log(`NSE Options Data : `);
-      // console.log(res.data);
-
-      this.options = res.data;
-      this.optionsMap = new Map<Number, {'CE': Option, 'PE': Option}>();
-
-      this.options.forEach((option:Option) => {
-        const obj:any = this.optionsMap.get(option.strikePrice) || {};
-        obj[option.type] = option;
-
-        this.optionsMap.set(option.strikePrice, obj);
-      });
-
-      console.log(`Options Map : `);
-      console.log(this.optionsMap);
-
-      this.strikePrices =[...this.optionsMap.keys()];
-      console.log(this.strikePrices);
-      
-      this.selectedStrikePrice = this.strikePrices[0];
-
-      this.getOptionChainData();
-    }, error => {
-      console.log("Error fetching Options Data.");
-    });
-  }
-
   setStrikePrices(){
+    this.optionsRequested = false;
+
     if(!this.selectedOptionIndex) return;
 
-    this.optionsMap = this.indexToStrikePricesMap.get(this.selectedOptionIndex.symbol) || new Map<Number, {'CE': Option, 'PE': Option}>();
+    const strikePricesMap = this.indexToStrikePricesMap.get(this.selectedOptionIndex.symbol);
 
     console.log(`Options Map : `);
-    console.log(this.optionsMap);
+    console.log(strikePricesMap);
 
-    this.strikePrices =[...this.optionsMap.keys()];
+    if(!strikePricesMap) return;
+
+    this.strikePrices =[...strikePricesMap.keys()];
     console.log(this.strikePrices);
     
-    this.selectedStrikePrice = this.strikePrices[0];
+    if(!this.selectedStrikePrice) this.selectedStrikePrice = this.strikePrices[0];
 
     this.getOptionChainData();
   }
 
   getOptionChainData(){
-    let selectedOptions:Array<any> = [];
+    let selectedOptions:Array<Option> = [];
 
-    const strikePriceVal = this.optionsMap.get(this.selectedStrikePrice);
+    if(!this.selectedOptionIndex) {
+      alert('Option Index is not selected.');
+      return;
+    }
+    
+    const strikePricesMap = this.indexToStrikePricesMap.get(this.selectedOptionIndex.symbol);
+
+    if(!strikePricesMap || this.strikePrices.length===0) {
+      console.log('Strike Prices not present for selected OptionIndex.');
+      return;
+    }
+
+    const strikePriceVal = strikePricesMap.get(this.selectedStrikePrice);
 
     if(strikePriceVal){
       selectedOptions.push(strikePriceVal['CE']);
       selectedOptions.push(strikePriceVal['PE']);
     }
 
-    for (const selectedOption of selectedOptions) {
-      console.log('/api/v1/nse-options/option-chain-data');
-      console.log(selectedOption);
+    this.oiChartService.getOptionChainData(selectedOptions).subscribe(response => {
+      console.log(`NSE Options Chain Data : `);
       
-      this.http.get(`/api/v1/nse-options/option-chain-data/${selectedOption['_id']}`).subscribe((res: any) => {
-        console.log(`NSE Options Chain Data : `);
-        console.log(res.data);
-        
-        console.log(selectedOption.strikePrice +' - '+selectedOption.type);
-        let chartData: ChartDataSets = { data: res.data.map((val:any) => val.changeinOpenInterest), label: `${selectedOption.strikePrice} ${selectedOption.type}` };
+      for (let i=0; i<response.length; i++) {
+      // console.log(selectedOptions[i].strikePrice +' - '+selectedOptions[i].type);
+      // console.log(response[i].data);
 
-        if(selectedOption.type === 'CE') {
-          this.optionChainData[0] = chartData;
-          this.lineChartColors[0] = {
-            borderColor: '#f73131', // #f73131 - Red, #00ad00 - Green, #fcba03 - Yellow
-            backgroundColor: 'rgba(0,0,0,0)'
-          }
-        }
-        else {
-          this.optionChainData[1] = chartData;
-          this.lineChartColors[1] = {
-            borderColor: ['#00ad00'], // #f73131 - Red, #00ad00 - Green, #fcba03 - Yellow
-            backgroundColor: ['rgba(0,0,0,0)']
-          }
-        }
-        
-        this.oiChartLabels = res.data.map((val:any) => val.lastUpdatedTime.split(" ")[1]);
+        this.optionChainData[i] = { 
+          data: response[i].data.map((val:any) => val.changeinOpenInterest), 
+          label: `${selectedOptions[i].strikePrice} ${selectedOptions[i].type}` 
+        };
 
-        if(this.linechart) {
-          console.log(`Chart re-rendering`);
-          
-          setTimeout(() => {
-            this.linechart?.getChartBuilder(this.linechart.ctx);
-          }, 10);
-        } else {
-          console.log(`only happens first time chart is rendered`);
-          
+        this.lineChartColors[i] = {
+          borderColor: (i===0) ? '#f73131' : '#00ad00', // #f73131 - Red, #00ad00 - Green, #fcba03 - Yellow
+          backgroundColor: 'rgba(0,0,0,0)'
         }
-      }, error => {
-        console.log("Error fetching Options Data.");
-      });
+      }
+      
+      this.oiChartLabels = response[0].data.map((val:any) => val.lastUpdatedTime.split(" ")[1]);
 
-    }
+      if(this.linechart) 
+        setTimeout(() => {
+          this.linechart?.getChartBuilder(this.linechart.ctx);
+        }, 10);
+      // else console.log(`Only happens first time chart is rendered`);
+    }, error => {
+      console.log("Error fetching Options Data.");
+    });
   }
 
-  onOptionIndexChange(oi: any){
-    console.log('onOptionIndexChange');
+  onOptionIndexChange(oi: OptionIndex){
+    console.log('OptionIndexChange : ');
     console.log(oi);
 
     this.selectedOptionIndex = oi;
 
-    this.getOptions();
+    console.log(this.indexToStrikePricesMap.get(this.selectedOptionIndex.symbol));
+    
+    this.selectedStrikePrice = 0;
+
+    if(this.indexToStrikePricesMap.get(this.selectedOptionIndex.symbol))
+      this.setStrikePrices();
+    else {
+      this.optionsRequested = true;
+      this.oiChartService.getOptions(this.selectedOptionIndex);
+    }
   }
 
   onStrikePriceChange(sp: any){
@@ -233,5 +194,10 @@ export class OIChartComponent implements OnInit {
     // get the canvas
     anchor.href = document.getElementsByTagName('canvas')[0].toDataURL();
     anchor.download = `${this.selectedOptionIndex?.symbol} ${this.selectedStrikePrice} - ${dateString} ${d.toLocaleTimeString()}.png`;
+  }
+
+  ngOnDestroy() {
+    // prevent memory leak when component destroyed
+    this.optionsRequestedSubscription.unsubscribe();
   }
 }
