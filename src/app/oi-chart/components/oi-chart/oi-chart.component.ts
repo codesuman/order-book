@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
@@ -44,6 +44,7 @@ export class OIChartComponent implements OnInit, OnDestroy {
   public lineChartLegend = true;
   public lineChartType: ChartType = 'line';
   public lineChartPlugins = [];
+  public oiChartLabels: Label[] = [];
 
   @ViewChild('linechart') linechart: BaseChartDirective | undefined;
   // Charts - END
@@ -55,17 +56,15 @@ export class OIChartComponent implements OnInit, OnDestroy {
 
   // INDEX - Select Box - START
   optionIndices: Array<OptionIndex> = [];
-  selectedOptionIndex: OptionIndex | null = null;
+  @Input() selectedOptionIndex: OptionIndex | null = null;
   // INDEX - Select Box - END
 
   // STRIKE PRICE - Select Box - START
   strikePrices: Array<Number> = [];
-  selectedStrikePrice: Number = 0;
+  @Input() selectedStrikePrice: Number = 0;
   // STRIKE PRICE - Select Box - END
 
   indexToStrikePricesMap = new Map<String, Map<Number, {'CE': Option, 'PE': Option}>>();
-
-  public oiChartLabels: Label[] = [];
 
   constructor(private oiChartService: OiChartService) {
     this.optionsRequestedSubscription = this.oiChartService.optionsFetched$.subscribe(val => {
@@ -91,7 +90,7 @@ export class OIChartComponent implements OnInit, OnDestroy {
 
     const strikePricesMap = this.indexToStrikePricesMap.get(this.selectedOptionIndex.symbol);
 
-    console.log(`Options Map : `);
+    console.log(`Strike Prices Map : `);
     console.log(strikePricesMap);
 
     if(!strikePricesMap) return;
@@ -139,7 +138,7 @@ export class OIChartComponent implements OnInit, OnDestroy {
         };
 
         this.lineChartColors[i] = {
-          borderColor: (i===0) ? '#f73131' : '#00ad00', // #f73131 - Red, #00ad00 - Green, #fcba03 - Yellow
+          borderColor: (i===0) ? '#00ad00' : '#f73131', // #f73131 - Red, #00ad00 - Green, #fcba03 - Yellow
           backgroundColor: 'rgba(0,0,0,0)'
         }
       }
@@ -196,6 +195,20 @@ export class OIChartComponent implements OnInit, OnDestroy {
     anchor.download = `${this.selectedOptionIndex?.symbol} ${this.selectedStrikePrice} - ${dateString} ${d.toLocaleTimeString()}.png`;
   }
 
+  cloneOIChart(event: any){
+    if(event) event.preventDefault();
+
+    console.log(`Clone OI Chart : `);
+    console.log(event);
+
+    if(this.selectedOptionIndex && this.selectedStrikePrice)
+      this.oiChartService.addChartComponent({
+        id: this.oiChartService.chartComponentsArray.length+1,
+        index: this.selectedOptionIndex,
+        strikePrice: this.selectedStrikePrice
+      });
+  }
+  
   ngOnDestroy() {
     // prevent memory leak when component destroyed
     this.optionsRequestedSubscription.unsubscribe();

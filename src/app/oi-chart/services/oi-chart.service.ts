@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subject, forkJoin } from 'rxjs';
+import { ChartComponent } from '../interfaces/chart-component';
 
 import { Option } from '../interfaces/option';
 import { OptionIndex } from '../interfaces/option-index';
@@ -19,7 +20,10 @@ export class OiChartService {
   optionIndices: Array<OptionIndex> = [];
   indexToStrikePricesMap = new Map<String, Map<Number, {'CE': Option, 'PE': Option}>>();
   
-  constructor(private http:HttpClient) { 
+  chartComponentsArray: Array<ChartComponent> = [];
+
+  constructor(private http:HttpClient) {
+    console.log(`OI Chart Service : `);
     this.getOptionIndices();
   }
 
@@ -44,22 +48,31 @@ export class OiChartService {
       // console.log(res.data);
 
       let options = res.data;
-      let optionsMap = new Map<Number, {'CE': Option, 'PE': Option}>();
+      let strikePricesMap = new Map<Number, {'CE': Option, 'PE': Option}>();
 
       options.forEach((option:Option) => {
-        const obj:any = optionsMap.get(option.strikePrice) || {};
+        const obj:any = strikePricesMap.get(option.strikePrice) || {};
         obj[option.type] = option;
 
-        optionsMap.set(option.strikePrice, obj);
+        strikePricesMap.set(option.strikePrice, obj);
       });
 
-      console.log(`Options Map : `);
-      console.log(optionsMap);
+      console.log(`OI Chart Service => Strike Price Map : `);
+      console.log(strikePricesMap);
 
-      this.indexToStrikePricesMap.set((optionIndex) ? optionIndex.symbol : this.optionIndices[0].symbol, optionsMap);
+      this.indexToStrikePricesMap.set((optionIndex) ? optionIndex.symbol : this.optionIndices[0].symbol, strikePricesMap);
 
       if(optionIndex) this.optionsFetched.next(true);
-      else this.optionIndicesFetched.next(true);
+      else {
+        console.log(`Loading charts for first time : `);
+        this.chartComponentsArray.push({
+          id:1,
+          index: this.optionIndices[0],
+          strikePrice: strikePricesMap.entries().next().value[0]
+        });
+
+        this.optionIndicesFetched.next(true);
+      }
     }, error => {
       console.log("Error fetching Options Data.");
     });
@@ -70,5 +83,9 @@ export class OiChartService {
       this.http.get(`/api/v1/nse-options/option-chain-data/${selectedOptions[0]['_id']}`),
       this.http.get(`/api/v1/nse-options/option-chain-data/${selectedOptions[1]['_id']}`)
     ]);
+  }
+
+  addChartComponent(chartComp: ChartComponent){
+    this.chartComponentsArray.push(chartComp);
   }
 }
