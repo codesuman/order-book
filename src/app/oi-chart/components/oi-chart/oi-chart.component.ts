@@ -104,8 +104,6 @@ export class OIChartComponent implements OnInit, OnDestroy {
   }
 
   getOptionChainData(){
-    let selectedOptions:Array<Option> = [];
-
     if(!this.selectedOptionIndex) {
       alert('Option Index is not selected.');
       return;
@@ -119,6 +117,7 @@ export class OIChartComponent implements OnInit, OnDestroy {
     }
 
     const strikePriceVal = strikePricesMap.get(this.selectedStrikePrice);
+    const selectedOptions:Array<Option> = [];
 
     if(strikePriceVal){
       selectedOptions.push(strikePriceVal['CE']);

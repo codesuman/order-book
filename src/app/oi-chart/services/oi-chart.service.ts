@@ -10,9 +10,9 @@ import { OptionIndex } from '../interfaces/option-index';
   providedIn: 'root'
 })
 export class OiChartService {
-  // OptionIndicesFetched subject will be used by OIChartsContainerComponent when it should load the Chart components for first time
-  private optionIndicesFetched = new Subject<boolean>();
-  optionIndicesFetched$ = this.optionIndicesFetched.asObservable();
+  // ChartContainerReload subject will be used by OIChartsContainerComponent when it should load the entire Chart components from scratch
+  private chartContainerReload = new Subject<boolean>();
+  chartContainerReload$ = this.chartContainerReload.asObservable();
 
   private optionsFetched = new Subject<boolean>();
   optionsFetched$ = this.optionsFetched.asObservable();
@@ -34,7 +34,7 @@ export class OiChartService {
 
       this.optionIndices = res.data;
 
-      this.getOptions();
+      this.getOptions(this.optionIndices[0], true);
     }, error => {
       console.log("Error fetching Option Indices.");
     });
@@ -42,13 +42,13 @@ export class OiChartService {
 
   // optionIndex : will be null of first time, when its called in the service constructor
   // Rest it will be called from OI Chart Component's 
-  getOptions(optionIndex?: OptionIndex){
-    this.http.get(`/api/v1/nse-options/options/${(optionIndex) ? optionIndex.symbol : this.optionIndices[0].symbol}`).subscribe((res: any) => {
+  getOptions(optionIndex: OptionIndex = this.optionIndices[0], chartContainerReload: boolean = false){
+    this.http.get(`/api/v1/nse-options/options/${optionIndex.symbol}`).subscribe((res: any) => {
       // console.log(`NSE Options Data : `);
       // console.log(res.data);
 
-      let options = res.data;
-      let strikePricesMap = new Map<Number, {'CE': Option, 'PE': Option}>();
+      const options = res.data;
+      const strikePricesMap = new Map<Number, {'CE': Option, 'PE': Option}>();
 
       options.forEach((option:Option) => {
         const obj:any = strikePricesMap.get(option.strikePrice) || {};
@@ -60,18 +60,34 @@ export class OiChartService {
       console.log(`OI Chart Service => Strike Price Map : `);
       console.log(strikePricesMap);
 
-      this.indexToStrikePricesMap.set((optionIndex) ? optionIndex.symbol : this.optionIndices[0].symbol, strikePricesMap);
+      this.indexToStrikePricesMap.set(optionIndex.symbol, strikePricesMap);
+      
+      if(chartContainerReload) {
+        this.chartComponentsArray = [];
 
-      if(optionIndex) this.optionsFetched.next(true);
-      else {
-        console.log(`Loading charts for first time : `);
-        this.chartComponentsArray.push({
-          id:1,
-          index: this.optionIndices[0],
-          strikePrice: strikePricesMap.entries().next().value[0]
+        console.log(`Reloading Charts container / Loading charts for first time : `);
+
+        console.log(`Nearest Strike Prices : `);
+        
+        const spFloor = Math.floor(optionIndex.underlyingValue/100)*100;
+        const strikePricesArray = Array.from(strikePricesMap.keys());
+        let i = 0;
+        strikePricesArray.some((sp,ind) =>{ if(sp===spFloor){i=ind; return true;} return false;});
+
+        const nearestStrikePrices = strikePricesArray.slice((i-2 <= 0) ? 0 : i-2, i+2);
+        console.log(nearestStrikePrices);
+
+        nearestStrikePrices.forEach((nsp, ind) => {
+          this.chartComponentsArray.push({
+            id:ind,
+            index: optionIndex,
+            strikePrice: nsp
+          });
         });
 
-        this.optionIndicesFetched.next(true);
+        this.chartContainerReload.next(true);
+      } else {
+        this.optionsFetched.next(true);
       }
     }, error => {
       console.log("Error fetching Options Data.");

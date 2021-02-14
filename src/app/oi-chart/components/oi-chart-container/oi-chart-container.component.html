@@ -1,6 +1,19 @@
-<ng-container *ngIf="loadCharts">
+<div class="row" style="margin: 15px 0;">
+    <div class="col-sm-4">
+        <label for="optionIndices">Index:</label>&nbsp;
+        <select name="optionIndices" id="optionIndices" (ngModelChange)="onOptionIndexChange($event)" [ngModel]="selectedOptionIndex">
+            <option [ngValue]="optionIndex" *ngFor="let optionIndex of optionIndices">{{optionIndex.symbol}}</option>
+        </select>
+    </div>
+</div>
+
+<ng-container *ngIf="chartComponentsArray.length>0;else loadingChartComps">
     <oi-chart *ngFor="let chartComp of chartComponentsArray" 
         [selectedOptionIndex]="chartComp.index" 
         [selectedStrikePrice]="chartComp.strikePrice">
     </oi-chart>
 </ng-container>
+
+<ng-template #loadingChartComps>
+    Loading data...
+</ng-template>

@@ -13,19 +13,31 @@ import { OiChartService } from '../../services/oi-chart.service';
 })
 export class OIChartContainerComponent implements OnDestroy {
   optionIndices: Array<OptionIndex> = [];
+  selectedOptionIndex: OptionIndex | null = null;
+
   indexToStrikePricesMap = new Map<String, Map<Number, {'CE': Option, 'PE': Option}>>();
-  loadCharts: boolean = false;
   optionIndicesFetchedSubscription: Subscription;
+
   chartComponentsArray: Array<ChartComponent> = [];
 
   constructor(private oiChartService: OiChartService) {
-    this.optionIndicesFetchedSubscription = this.oiChartService.optionIndicesFetched$.subscribe(val => {
+    this.optionIndicesFetchedSubscription = this.oiChartService.chartContainerReload$.subscribe(val => {
       this.optionIndices = this.oiChartService.optionIndices;
+      if(!this.selectedOptionIndex) this.selectedOptionIndex = this.optionIndices[0];
+
       this.indexToStrikePricesMap = this.oiChartService.indexToStrikePricesMap;
       this.chartComponentsArray = this.oiChartService.chartComponentsArray;
-      
-      this.loadCharts = val;
     });
+  }
+
+  onOptionIndexChange(oi: OptionIndex){
+    console.log('Chart Container => OptionIndexChange : ');
+    console.log(oi);
+
+    this.selectedOptionIndex = oi;
+
+    this.chartComponentsArray = [];
+    this.oiChartService.getOptions(this.selectedOptionIndex, true);
   }
 
   ngOnDestroy() {
