@@ -39,9 +39,7 @@ export class OiChartService {
       console.log("Error fetching Option Indices.");
     });
   }
-
-  // optionIndex : will be null of first time, when its called in the service constructor
-  // Rest it will be called from OI Chart Component's 
+ 
   getOptions(optionIndex: OptionIndex = this.optionIndices[0], chartContainerReload: boolean = false){
     this.http.get(`/api/v1/nse-options/options/${optionIndex.symbol}`).subscribe((res: any) => {
       // console.log(`NSE Options Data : `);
