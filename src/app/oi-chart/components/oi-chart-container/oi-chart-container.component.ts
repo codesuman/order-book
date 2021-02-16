@@ -19,11 +19,15 @@ export class OIChartContainerComponent implements OnDestroy {
   optionIndicesFetchedSubscription: Subscription;
 
   chartComponentsArray: Array<ChartComponent> = [];
+  intervalId: any;
 
   constructor(private oiChartService: OiChartService) {
     this.optionIndicesFetchedSubscription = this.oiChartService.chartContainerReload$.subscribe(val => {
       this.optionIndices = this.oiChartService.optionIndices;
-      if(!this.selectedOptionIndex) this.selectedOptionIndex = this.optionIndices[0];
+      if(!this.selectedOptionIndex) {
+        const selOptIndex = localStorage.getItem("SelectedOptionIndex");
+        this.selectedOptionIndex = (selOptIndex) ? this.optionIndices.filter(opt => opt.symbol === selOptIndex)[0]: this.optionIndices[0];
+      }
 
       this.indexToStrikePricesMap = this.oiChartService.indexToStrikePricesMap;
       this.chartComponentsArray = this.oiChartService.chartComponentsArray;
@@ -31,10 +35,11 @@ export class OIChartContainerComponent implements OnDestroy {
   }
 
   onOptionIndexChange(oi: OptionIndex){
-    console.log('Chart Container => OptionIndexChange : ');
-    console.log(oi);
+    // console.log('Chart Container => OptionIndexChange : ');
+    // console.log(oi);
 
     this.selectedOptionIndex = oi;
+    localStorage.setItem("SelectedOptionIndex", this.selectedOptionIndex.symbol);
 
     this.chartComponentsArray = [];
     this.oiChartService.getOptions(this.selectedOptionIndex, true);
@@ -42,6 +47,8 @@ export class OIChartContainerComponent implements OnDestroy {
 
   ngOnDestroy() {
     // prevent memory leak when component destroyed
+    console.log(`Chart Container => ngOnDestroy`);
+
     this.optionIndicesFetchedSubscription.unsubscribe();
   }
 }

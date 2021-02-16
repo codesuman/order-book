@@ -44,7 +44,7 @@ export class HomeComponent implements OnInit {
     });
     
     if(!order) {
-      console.log(`Not found a valid order to clone.`);
+      // console.log(`Not found a valid order to clone.`);
       return;
     }
 

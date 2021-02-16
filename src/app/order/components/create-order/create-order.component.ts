@@ -108,7 +108,7 @@ export class CreateOrderComponent implements OnInit {
   }
 
   reconcileAveragePrice(){
-    console.log(`ReconcileAveragePrice`);
+    // console.log(`ReconcileAveragePrice`);
     
     let totalPrice = 0;
     let totalQty = 0;

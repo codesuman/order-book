@@ -1,4 +1,4 @@
-<div class="row" style="margin: 15px 0;">
+<div class="row container-header">
     <div class="col-sm-4">
         <label for="optionIndices">Index:</label>&nbsp;
         <select name="optionIndices" id="optionIndices" (ngModelChange)="onOptionIndexChange($event)" [ngModel]="selectedOptionIndex">
@@ -17,3 +17,12 @@
 <ng-template #loadingChartComps>
     Loading data...
 </ng-template>
+
+<div class="row container-footer">
+    <div class="col-sm-4">
+        <label for="optionIndices">Index:</label>&nbsp;
+        <select name="optionIndices" id="optionIndices" (ngModelChange)="onOptionIndexChange($event)" [ngModel]="selectedOptionIndex">
+            <option [ngValue]="optionIndex" *ngFor="let optionIndex of optionIndices">{{optionIndex.symbol}}</option>
+        </select>
+    </div>
+</div>

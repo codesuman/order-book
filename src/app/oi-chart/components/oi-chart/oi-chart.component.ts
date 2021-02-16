@@ -65,6 +65,7 @@ export class OIChartComponent implements OnInit, OnDestroy {
   // STRIKE PRICE - Select Box - END
 
   indexToStrikePricesMap = new Map<String, Map<Number, {'CE': Option, 'PE': Option}>>();
+  intervalId: any;
 
   constructor(private oiChartService: OiChartService) {
     this.optionsRequestedSubscription = this.oiChartService.optionsFetched$.subscribe(val => {
@@ -81,6 +82,8 @@ export class OIChartComponent implements OnInit, OnDestroy {
     if(!this.selectedOptionIndex) this.selectedOptionIndex = this.optionIndices[0];
 
     this.setStrikePrices();
+
+    this.autoReload();
   }
 
   setStrikePrices(){
@@ -90,17 +93,26 @@ export class OIChartComponent implements OnInit, OnDestroy {
 
     const strikePricesMap = this.indexToStrikePricesMap.get(this.selectedOptionIndex.symbol);
 
-    console.log(`Strike Prices Map : `);
-    console.log(strikePricesMap);
+    // console.log(`Strike Prices Map : `);
+    // console.log(strikePricesMap);
 
     if(!strikePricesMap) return;
 
     this.strikePrices =[...strikePricesMap.keys()];
-    console.log(this.strikePrices);
+    // console.log(this.strikePrices);
     
     if(!this.selectedStrikePrice) this.selectedStrikePrice = this.strikePrices[0];
 
     this.getOptionChainData();
+  }
+
+  autoReload(){
+    clearInterval(this.intervalId);
+    this.intervalId = setInterval(() => {
+      console.log(`Charts auto reloading...`);
+      
+      if(this.selectedStrikePrice) this.getOptionChainData();
+    },60000);
   }
 
   getOptionChainData(){
@@ -112,7 +124,7 @@ export class OIChartComponent implements OnInit, OnDestroy {
     const strikePricesMap = this.indexToStrikePricesMap.get(this.selectedOptionIndex.symbol);
 
     if(!strikePricesMap || this.strikePrices.length===0) {
-      console.log('Strike Prices not present for selected OptionIndex.');
+      // console.log('Strike Prices not present for selected OptionIndex.');
       return;
     }
 
@@ -125,7 +137,7 @@ export class OIChartComponent implements OnInit, OnDestroy {
     }
 
     this.oiChartService.getOptionChainData(selectedOptions).subscribe(response => {
-      console.log(`NSE Options Chain Data : `);
+      // console.log(`NSE Options Chain Data : `);
       
       for (let i=0; i<response.length; i++) {
       // console.log(selectedOptions[i].strikePrice +' - '+selectedOptions[i].type);
@@ -137,7 +149,7 @@ export class OIChartComponent implements OnInit, OnDestroy {
         };
 
         this.lineChartColors[i] = {
-          borderColor: (i===0) ? '#00ad00' : '#f73131', // #f73131 - Red, #00ad00 - Green, #fcba03 - Yellow
+          borderColor: (i===0) ? '#f73131' : '#00ad00', // #f73131 - Red, #00ad00 - Green, #fcba03 - Yellow
           backgroundColor: 'rgba(0,0,0,0)'
         }
       }
@@ -155,12 +167,12 @@ export class OIChartComponent implements OnInit, OnDestroy {
   }
 
   onOptionIndexChange(oi: OptionIndex){
-    console.log('OptionIndexChange : ');
-    console.log(oi);
+    // console.log('OptionIndexChange : ');
+    // console.log(oi);
 
     this.selectedOptionIndex = oi;
 
-    console.log(this.indexToStrikePricesMap.get(this.selectedOptionIndex.symbol));
+    // console.log(this.indexToStrikePricesMap.get(this.selectedOptionIndex.symbol));
     
     this.selectedStrikePrice = 0;
 
@@ -173,17 +185,19 @@ export class OIChartComponent implements OnInit, OnDestroy {
   }
 
   onStrikePriceChange(sp: any){
-    console.log('onStrikePriceChange');
-    console.log(sp);
+    // console.log('onStrikePriceChange');
+    // console.log(sp);
 
     this.selectedStrikePrice = sp;
 
-    console.log(this.selectedStrikePrice);
+    // console.log(this.selectedStrikePrice);
 
     this.getOptionChainData();
   }
 
   downloadCanvas(event: any) {
+    if(event) event.preventDefault();
+
     let d = new Date();
     let [day, ...date] = d.toDateString().split(' ');
     let dateString: String = date.join(" ");
@@ -197,8 +211,8 @@ export class OIChartComponent implements OnInit, OnDestroy {
   cloneOIChart(event: any){
     if(event) event.preventDefault();
 
-    console.log(`Clone OI Chart : `);
-    console.log(event);
+    // console.log(`Clone OI Chart : `);
+    // console.log(event);
 
     if(this.selectedOptionIndex && this.selectedStrikePrice)
       this.oiChartService.addChartComponent({
@@ -210,6 +224,9 @@ export class OIChartComponent implements OnInit, OnDestroy {
   
   ngOnDestroy() {
     // prevent memory leak when component destroyed
+    // console.log(`Chart Component => ngOnDestroy`);
+
+    clearInterval(this.intervalId);
     this.optionsRequestedSubscription.unsubscribe();
   }
 }

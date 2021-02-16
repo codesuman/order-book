@@ -18,7 +18,7 @@ export class PNLComponent implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit(): void {
-    console.log(`PNLComponent -> ngOnInit`);
+    // console.log(`PNLComponent -> ngOnInit`);
     
     if(this.order) {
       const hues = [145, 6];
@@ -46,21 +46,21 @@ export class PNLComponent implements OnInit {
 
   editClick(event: MouseEvent){
     event.stopPropagation();
-    console.log(`Edit Clicked`);
+    // console.log(`Edit Clicked`);
 
     this.router.navigateByUrl(`/order-form/`+this.order.id);
   }
 
   cloneClick(event: MouseEvent){
     event.stopPropagation();
-    console.log(`Clone Clicked`);
+    // console.log(`Clone Clicked`);
 
     this.cloneOrder.emit(this.order.id);
   }
 
   deleteClick(event: MouseEvent){
     event.stopPropagation();
-    console.log(`Delete Clicked`);
+    // console.log(`Delete Clicked`);
 
     this.deleteOrder.emit(this.order.id);
   }

@@ -29,12 +29,19 @@ export class OiChartService {
 
   getOptionIndices(){
     this.http.get('/api/v1/nse-options/option-indices').subscribe((res: any) => {
-      console.log(`NSE Options Indices : `);
-      console.log(res.data);
+      // console.log(`NSE Options Indices : `);
+      // console.log(res.data);
 
       this.optionIndices = res.data;
 
-      this.getOptions(this.optionIndices[0], true);
+      // console.log(localStorage.getItem("SelectedOptionIndex"));
+      
+      if(!localStorage.getItem("SelectedOptionIndex")) 
+        localStorage.setItem("SelectedOptionIndex", this.optionIndices[0].symbol);
+
+      const selOptIndex = localStorage.getItem("SelectedOptionIndex");
+
+      this.getOptions(this.optionIndices.filter(opt => opt.symbol === selOptIndex)[0], true);
     }, error => {
       console.log("Error fetching Option Indices.");
     });
@@ -55,25 +62,29 @@ export class OiChartService {
         strikePricesMap.set(option.strikePrice, obj);
       });
 
-      console.log(`OI Chart Service => Strike Price Map : `);
-      console.log(strikePricesMap);
+      // console.log(`OI Chart Service => Strike Price Map : `);
+      // console.log(strikePricesMap);
 
       this.indexToStrikePricesMap.set(optionIndex.symbol, strikePricesMap);
       
       if(chartContainerReload) {
         this.chartComponentsArray = [];
 
-        console.log(`Reloading Charts container / Loading charts for first time : `);
+        // console.log(`Reloading Charts container / Loading charts for first time : `);
 
-        console.log(`Nearest Strike Prices : `);
         
         const spFloor = Math.floor(optionIndex.underlyingValue/100)*100;
         const strikePricesArray = Array.from(strikePricesMap.keys());
         let i = 0;
         strikePricesArray.some((sp,ind) =>{ if(sp===spFloor){i=ind; return true;} return false;});
 
-        const nearestStrikePrices = strikePricesArray.slice((i-2 <= 0) ? 0 : i-2, i+2);
-        console.log(nearestStrikePrices);
+        const nearestStrikePrices = strikePricesArray.slice((i-2 <= 0) ? 0 : i-2, i+4);
+
+        // console.log(`Strike Price floor : `);
+        // console.log(spFloor);
+
+        // console.log(`Nearest Strike Prices : `);
+        // console.log(nearestStrikePrices);
 
         nearestStrikePrices.forEach((nsp, ind) => {
           this.chartComponentsArray.push({

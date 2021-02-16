@@ -9,8 +9,8 @@ export class OrderService {
 
   constructor() { 
     this.orders = JSON.parse(<string>localStorage.getItem("Orders")) || [];
-    console.log(`OrderService -> constructor`);
-    console.log(this.orders.length);
+    // console.log(`OrderService -> constructor`);
+    // console.log(this.orders.length);
   }
 
   public createOrder(order: OrderDetails|null){
@@ -42,7 +42,7 @@ export class OrderService {
   public set orders(value: Array<OrderDetails>) {
     this._orders = value;
     
-    console.log(`Updating Local Storage...`);
+    // console.log(`Updating Local Storage...`);
     localStorage.setItem("Orders", JSON.stringify(this.orders));
   }
 }
