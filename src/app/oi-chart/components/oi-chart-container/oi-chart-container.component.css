@@ -4,3 +4,11 @@
     padding: 20px 0 15px 0;
     border-radius: 10px;
 }
+
+.chart-name-header{
+    margin: 20px 0;
+}
+
+.near-strikeprice{
+    padding: 20px 0;
+}

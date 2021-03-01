@@ -77,7 +77,7 @@ export class CreateOrderComponent implements OnInit {
           price: [0, Validators.required],
           quantity: [0, Validators.required],
           rangeStart: [0, Validators.required],
-          rangeEnd: [10, Validators.required],
+          rangeEnd: [25, Validators.required],
           interval: [0.5, Validators.required],
           priceQuantityPairs: this.fb.array([])
         });

@@ -1,17 +1,45 @@
 <div class="row container-header">
-    <div class="col-sm-4">
+    <div class="col-sm-8">
         <label for="optionIndices">Index:</label>&nbsp;
         <select name="optionIndices" id="optionIndices" (ngModelChange)="onOptionIndexChange($event)" [ngModel]="selectedOptionIndex">
             <option [ngValue]="optionIndex" *ngFor="let optionIndex of optionIndices">{{optionIndex.symbol}}</option>
         </select>
     </div>
+    <div class="col-sm-4">
+        <span class="float-right">Current Price : {{selectedOptionIndex?.underlyingValue}}</span>
+    </div>
+</div>
+
+<div class="row chart-name-header">
+    <div class="col-sm-6"><h2>Open Interest</h2></div>
+    <div class="col-sm-6"><h2>Change in Open Interest</h2></div>
 </div>
 
 <ng-container *ngIf="chartComponentsArray.length>0;else loadingChartComps">
+    <div class="row near-strikeprice">
+        <div class="col-sm-6">
+            <a href="#" class="float-right" (click)="oneUp($event)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-up" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708l6-6z"/>
+                    <path fill-rule="evenodd" d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>
+                </svg>
+            </a>
+        </div>
+    </div>
     <oi-chart *ngFor="let chartComp of chartComponentsArray" 
         [selectedOptionIndex]="chartComp.index" 
         [selectedStrikePrice]="chartComp.strikePrice">
     </oi-chart>
+    <div class="row near-strikeprice">
+        <div class="col-sm-6">
+            <a href="#" class="float-right" (click)="oneDown($event)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-down" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M1.646 6.646a.5.5 0 0 1 .708 0L8 12.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                    <path fill-rule="evenodd" d="M1.646 2.646a.5.5 0 0 1 .708 0L8 8.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                </svg>
+            </a>
+        </div>
+    </div>
 </ng-container>
 
 <ng-template #loadingChartComps>
@@ -19,10 +47,13 @@
 </ng-template>
 
 <div class="row container-footer">
-    <div class="col-sm-4">
+    <div class="col-sm-8">
         <label for="optionIndices">Index:</label>&nbsp;
         <select name="optionIndices" id="optionIndices" (ngModelChange)="onOptionIndexChange($event)" [ngModel]="selectedOptionIndex">
             <option [ngValue]="optionIndex" *ngFor="let optionIndex of optionIndices">{{optionIndex.symbol}}</option>
         </select>
+    </div>
+    <div class="col-sm-4">
+        <span class="float-right">Current Price : {{selectedOptionIndex?.underlyingValue}}</span>
     </div>
 </div>

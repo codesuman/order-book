@@ -45,6 +45,28 @@ export class OIChartContainerComponent implements OnDestroy {
     this.oiChartService.getOptions(this.selectedOptionIndex, true);
   }
 
+  oneUp(event: any) {
+    if(event) event.preventDefault();
+
+    console.log(`One Up`);
+
+    if(this.selectedOptionIndex){
+      this.oiChartService.strikePricesTo = this.oiChartService.strikePricesTo+1;
+      this.onOptionIndexChange(this.selectedOptionIndex);
+    }
+  }
+
+  oneDown(event: any) {
+    if(event) event.preventDefault();
+
+    console.log(`One Down`);
+
+    if(this.selectedOptionIndex){
+      this.oiChartService.strikePricesFrom = this.oiChartService.strikePricesFrom-1;
+      this.onOptionIndexChange(this.selectedOptionIndex);
+    }
+  }
+
   ngOnDestroy() {
     // prevent memory leak when component destroyed
     console.log(`Chart Container => ngOnDestroy`);

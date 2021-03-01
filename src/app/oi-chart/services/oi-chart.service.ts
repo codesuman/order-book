@@ -22,6 +22,9 @@ export class OiChartService {
   
   chartComponentsArray: Array<ChartComponent> = [];
 
+  strikePricesFrom: number = 2;
+  strikePricesTo: number = 4;
+
   constructor(private http:HttpClient) {
     console.log(`OI Chart Service : `);
     this.getOptionIndices();
@@ -78,7 +81,7 @@ export class OiChartService {
         let i = 0;
         strikePricesArray.some((sp,ind) =>{ if(sp===spFloor){i=ind; return true;} return false;});
 
-        const nearestStrikePrices = strikePricesArray.slice((i-2 <= 0) ? 0 : i-2, i+4);
+        const nearestStrikePrices = strikePricesArray.slice((i-this.strikePricesFrom < 0) ? 0 : i-this.strikePricesFrom, i+this.strikePricesTo);
 
         // console.log(`Strike Price floor : `);
         // console.log(spFloor);
@@ -87,7 +90,7 @@ export class OiChartService {
         // console.log(nearestStrikePrices);
 
         nearestStrikePrices.forEach((nsp, ind) => {
-          this.chartComponentsArray.push({
+          this.chartComponentsArray.unshift({
             id:ind,
             index: optionIndex,
             strikePrice: nsp

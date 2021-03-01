@@ -14,10 +14,15 @@ import { OiChartService } from '../../services/oi-chart.service';
 })
 export class OIChartComponent implements OnInit, OnDestroy {
   // Charts - START
-  public optionChainData: ChartDataSets[] = [
+  public oiData: ChartDataSets[] = [
     { data: [], label: 'CE' },
     { data: [], label: 'PE' }
   ];
+  public changeInOIData: ChartDataSets[] = [
+    { data: [], label: 'CE' },
+    { data: [], label: 'PE' }
+  ];
+
   public lineChartOptions: ChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -46,7 +51,9 @@ export class OIChartComponent implements OnInit, OnDestroy {
   public lineChartPlugins = [];
   public oiChartLabels: Label[] = [];
 
-  @ViewChild('linechart') linechart: BaseChartDirective | undefined;
+  @ViewChild('oiChart') oiChart: BaseChartDirective | undefined;
+  @ViewChild('changeInOIChart') changeInOIChart: BaseChartDirective | undefined;
+
   // Charts - END
 
   // OPTION INDEX CHANGE - Variables - START
@@ -66,7 +73,8 @@ export class OIChartComponent implements OnInit, OnDestroy {
 
   indexToStrikePricesMap = new Map<String, Map<Number, {'CE': Option, 'PE': Option}>>();
   intervalId: any;
-
+  showDownloadButton: boolean = false;
+  
   constructor(private oiChartService: OiChartService) {
     this.optionsRequestedSubscription = this.oiChartService.optionsFetched$.subscribe(val => {
       if(this.optionsRequested) this.setStrikePrices();
@@ -143,7 +151,12 @@ export class OIChartComponent implements OnInit, OnDestroy {
       // console.log(selectedOptions[i].strikePrice +' - '+selectedOptions[i].type);
       // console.log(response[i].data);
 
-        this.optionChainData[i] = { 
+        this.oiData[i] = { 
+          data: response[i].data.map((val:any) => val.openInterest), 
+          label: `${selectedOptions[i].strikePrice} ${selectedOptions[i].type}` 
+        };
+
+        this.changeInOIData[i] = { 
           data: response[i].data.map((val:any) => val.changeinOpenInterest), 
           label: `${selectedOptions[i].strikePrice} ${selectedOptions[i].type}` 
         };
@@ -156,10 +169,15 @@ export class OIChartComponent implements OnInit, OnDestroy {
       
       this.oiChartLabels = response[0].data.map((val:any) => val.lastUpdatedTime.split(" ")[1]);
 
-      if(this.linechart) 
+      if(this.oiChart) 
         setTimeout(() => {
-          this.linechart?.getChartBuilder(this.linechart.ctx);
+          this.oiChart?.getChartBuilder(this.oiChart.ctx);
         }, 10);
+
+      if(this.changeInOIChart) 
+      setTimeout(() => {
+        this.changeInOIChart?.getChartBuilder(this.changeInOIChart.ctx);
+      }, 10);
       // else console.log(`Only happens first time chart is rendered`);
     }, error => {
       console.log("Error fetching Options Data.");
@@ -205,7 +223,7 @@ export class OIChartComponent implements OnInit, OnDestroy {
     let anchor = event.target;
     // get the canvas
     anchor.href = document.getElementsByTagName('canvas')[0].toDataURL();
-    anchor.download = `${this.selectedOptionIndex?.symbol} ${this.selectedStrikePrice} - ${dateString} ${d.toLocaleTimeString()}.png`;
+    anchor.download = `${this.selectedStrikePrice} - ${dateString} ${d.toLocaleTimeString()}.png`;
   }
 
   cloneOIChart(event: any){
